@@ -1,9 +1,13 @@
 <?php
+namespace Rg\Generator\Tests;
+
 use Rg\Generator\RandomIntegerBatchGenerator;
 
 class RandomIntegerBatchGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @test
+     *
      * @param int $expectedSize
      * @param int $expectedMax
      * @param int[] $batch

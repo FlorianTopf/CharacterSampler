@@ -1,9 +1,13 @@
 <?php
+namespace Rg\Generator\Tests;
+
 use Rg\Generator\RandomIntegerGenerator;
 
 class RandomIntegerGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @test
+     *
      * @param int $expectedMax
      * @param int $integer
      *

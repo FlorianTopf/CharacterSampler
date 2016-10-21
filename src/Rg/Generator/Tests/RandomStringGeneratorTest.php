@@ -1,10 +1,14 @@
 <?php
+namespace Rg\Generator\Tests;
+
 use Rg\Generator\RandomStringGenerator;
 use Rg\Generator\RandomIntegerGenerator;
 
 class RandomStringGeneratorTest extends \PHPUnit_Framework_TestCase
 {
     /**
+     * @test
+     *
      * @param int $expectedLength
      * @param int $string
      *
