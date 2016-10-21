@@ -11,12 +11,12 @@ class StreamFileReader
     protected $fileResource;
 
     /**
-     * @param resource $fileStreamResource
+     * @param resource $fileResource
      */
-    public function __construct($fileStreamResource)
+    public function __construct($fileResource)
     {
-        stream_set_blocking($fileStreamResource, false);
-        $this->fileResource = $fileStreamResource;
+        stream_set_blocking($fileResource, false);
+        $this->fileResource = $fileResource;
     }
 
     /**
