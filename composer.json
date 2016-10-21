@@ -1,0 +1,20 @@
+{
+  "name": "character sampler",
+  "type": "project",
+  "description": "character sampler for research gate",
+  "authors":[
+    {
+      "name": "FlorianTopf"
+    }
+  ],
+  "autoload": {
+    "psr-0": {
+      "": ["src/"]
+    }
+  },
+  "require": {
+  },
+  "require-dev": {
+    "phpunit/phpunit": "^4.8"
+  }
+}
