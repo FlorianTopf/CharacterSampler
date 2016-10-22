@@ -4,7 +4,6 @@ require_once(__DIR__ . '/vendor/autoload.php');
 use Rg\Reader\StreamFileReader;
 use Rg\Client\CurlClient;
 use Rg\Generator\RandomIntegerGenerator;
-use Rg\Generator\RandomIntegerBatchGenerator;
 use Rg\Generator\RandomStringGenerator;
 use Rg\Cli\CharacterSamplerCli;
 
@@ -18,7 +17,9 @@ $characterSamplerCli = new CharacterSamplerCli(
     new RandomStringGenerator($randomIntegerGenerator)
 );
 
-if ($sample = $characterSamplerCli->getSample()) {
+$cliArguments = getopt('', ['size:', 'type:']);
+
+if ($sample = $characterSamplerCli->getSample($cliArguments)) {
     echo 'Random Sample: ' . $sample . PHP_EOL;
 }
 

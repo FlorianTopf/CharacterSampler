@@ -32,14 +32,15 @@ class StreamFileSampler implements SamplerInterface
 
     /**
      * @inheritdoc
+     *
+     * If the input size is big enough to support multiple read iterations the sampler will pick characters
+     * horizontally and vertically
      */
     public function create($sampleSize)
     {
         $possibleReadIterations = $this->streamFileReader->getReadIterations();
 
-        // if the amount of possible stream chunks is lower than sample size
-        // the sample will be taken from one chunk
-        if (0 === $possibleReadIterations || $sampleSize > $possibleReadIterations) {
+        if (0 === $possibleReadIterations) {
             return $this->extractFromOneChunk($sampleSize);
         } else {
             return $this->extractFromMultipleChunks($sampleSize);
@@ -53,44 +54,64 @@ class StreamFileSampler implements SamplerInterface
      */
     protected function extractFromOneChunk($sampleSize)
     {
-        $sample = '';
-        $chunk = $this->stripLineBreaks($this->streamFileReader->read());
-
-        // if the sample size exceeds the available data the function does several iterations over the same stream
-        $neededReadIterations = (int) floor($sampleSize / strlen($chunk));
-
-        for ($iteration = 0; $iteration <= $neededReadIterations; $iteration++) {
-            $randomCharacterIndexes = $this->randomIntegerGenerator->generateBatch(strlen($chunk) - 1, $sampleSize);
-
-            foreach ($randomCharacterIndexes as $index) {
-                $sample .= $chunk[$index];
-            }
-        }
-
-        return $sample;
+        $chunk = $this->streamFileReader->read();
+        return $this->pickRandomCharactersFromChunk($chunk, $sampleSize);
     }
 
     /**
      * @param int $sampleSize
      *
      * @return string
+     *
+     * If sample size exceeds possible iterations the function picks more then one character per iteration
+     * Due to rounding of the characters per iteration, the final sample must be cut to fit the sample size
      */
     protected function extractFromMultipleChunks($sampleSize)
     {
         $sample = '';
+        $possibleReadIterations = $this->streamFileReader->getReadIterations();
         $randomChunkIndexes = $this->randomIntegerGenerator->generateBatch(
-            $this->streamFileReader->getReadIterations(),
+            $possibleReadIterations,
             $sampleSize
         );
-        $currentChunkIndex = 0;
 
+        $charactersPerIteration = 1;
+        if ($sampleSize > $possibleReadIterations) {
+            $charactersPerIteration = (int) ceil($sampleSize / $possibleReadIterations);
+        }
+
+        $currentChunkIndex = 0;
         while (false !== ($chunk = $this->streamFileReader->read())) {
             if (in_array($currentChunkIndex, $randomChunkIndexes)) {
-                $chunk = $this->stripLineBreaks($chunk);
-                $randomCharacterIndex = $this->randomIntegerGenerator->generate(strlen($chunk) - 1);
-                $sample .= $chunk[$randomCharacterIndex];
+                $sample .= $this->pickRandomCharactersFromChunk($chunk, $charactersPerIteration);
             }
             $currentChunkIndex++;
+        }
+
+        return substr($sample, 0, $sampleSize);
+    }
+
+    /**
+     * @param string $chunk
+     * @param int $sampleSize
+     *
+     * @return string
+     *
+     * If the sample size exceeds the available data the function does several iterations over the same chunk
+     */
+    protected function pickRandomCharactersFromChunk($chunk, $sampleSize)
+    {
+        $chunk = $this->stripLineBreaks($chunk);
+
+        $sample = '';
+        $neededReadIterations = (int) ceil($sampleSize / strlen($chunk));
+
+        for ($iteration = 1; $iteration <= $neededReadIterations; $iteration++) {
+            $randomCharacterIndexes = $this->randomIntegerGenerator->generateBatch(strlen($chunk) - 1, $sampleSize);
+
+            foreach ($randomCharacterIndexes as $index) {
+                $sample .= $chunk[$index];
+            }
         }
 
         return $sample;

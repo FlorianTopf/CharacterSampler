@@ -53,15 +53,10 @@ class StreamFileSamplerTest extends \PHPUnit_Framework_TestCase
             ->method('read')
             ->willReturnOnConsecutiveCalls($chunk, $chunk, $chunk, $chunk, $chunk, false);
 
-        $randomIntegerGeneratorMock->expects(static::once())
+        $randomIntegerGeneratorMock->expects(static::exactly(6))
             ->method('generateBatch')
-            ->with(5, 5)
-            ->willReturn([0, 1, 2, 3, 4]);
-
-        $randomIntegerGeneratorMock->expects(static::exactly(5))
-            ->method('generate')
-            ->with(34)
-            ->willReturnOnConsecutiveCalls(0, 1, 2, 3, 4);
+            ->withConsecutive([5, 5], [34, 1], [34, 1], [34, 1], [34, 1], [34, 1])
+            ->willReturnOnConsecutiveCalls([0, 1, 2, 3, 4], [0], [1], [2], [3], [4]);
 
         $this->assertEquals('THEQU', $streamFileSampler->create(5));
     }

@@ -12,6 +12,8 @@ use Rg\Sampler\StreamFileSampler;
 
 class CharacterSamplerCli
 {
+    const DEFAULT_SAMPLE_SIZE = 5;
+
     /**
      * @var StreamFileReader
      */
@@ -51,22 +53,15 @@ class CharacterSamplerCli
     }
 
     /**
-     * @return null|string
+     * @param string[] $cliArguments
+     *
+     * @return string
      */
-    public function getSample()
+    public function getSample(array $cliArguments)
     {
-        $cliArguments = $this->extractArguments();
         $sampleType = $this->getSampleType($cliArguments);
         $sampleSize = $this->getSampleSize($cliArguments);
         return $this->chooseSampler($sampleType)->create($sampleSize);
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function extractArguments()
-    {
-        return getopt('', ['size:', 'type:']);
     }
 
     /**
@@ -93,9 +88,9 @@ class CharacterSamplerCli
      */
     protected function getSampleSize(array $cliArguments)
     {
-        $sampleSize = 5;
+        $sampleSize = static::DEFAULT_SAMPLE_SIZE;
         if (array_key_exists('size', $cliArguments)) {
-            $sampleSize = (int) $cliArguments['size'] ?: 5;
+            $sampleSize = (int) $cliArguments['size'] ?: static::DEFAULT_SAMPLE_SIZE;
         }
 
         return $sampleSize;
