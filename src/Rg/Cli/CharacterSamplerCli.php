@@ -99,17 +99,17 @@ class CharacterSamplerCli
     protected function chooseSampler($sampleType) {
         switch ($sampleType) {
             case 'remote':
-                echo 'using remote sampler' . PHP_EOL;
+                echo 'Using Remote Sampler' . PHP_EOL;
                 return new HttpSourceSampler($this->curlClient);
             case 'file':
-                echo 'using file sampler' . PHP_EOL;
+                echo 'Using File Sampler' . PHP_EOL;
                 return new StreamFileSampler(
                     $this->streamFileReader,
                     $this->randomIntegerGenerator
                 );
             case 'local':
             default:
-                echo 'using local sampler' . PHP_EOL;
+                echo 'Using Local Sampler' . PHP_EOL;
                 return new LocalSourceSampler($this->randomStringGenerator);
         }
     }
