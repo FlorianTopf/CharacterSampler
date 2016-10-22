@@ -88,12 +88,7 @@ class CharacterSamplerCli
      */
     protected function getSampleSize(array $cliArguments)
     {
-        $sampleSize = static::DEFAULT_SAMPLE_SIZE;
-        if (array_key_exists('size', $cliArguments)) {
-            $sampleSize = (int) $cliArguments['size'] ?: static::DEFAULT_SAMPLE_SIZE;
-        }
-
-        return $sampleSize;
+        return (int) $cliArguments['size'] ?: static::DEFAULT_SAMPLE_SIZE;
     }
 
     /**

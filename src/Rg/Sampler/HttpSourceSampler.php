@@ -44,8 +44,8 @@ class HttpSourceSampler implements SamplerInterface
             ]
         );
 
-        $rawString = $this->stripLineBreaks($response);
+        $sample = $this->stripLineBreaks($response);
 
-        return substr($rawString, 0, $sampleSize);
+        return substr($sample, 0, $sampleSize);
     }
 }

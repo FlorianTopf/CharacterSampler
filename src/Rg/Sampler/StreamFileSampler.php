@@ -69,15 +69,15 @@ class StreamFileSampler implements SamplerInterface
     protected function extractFromMultipleChunks($sampleSize)
     {
         $sample = '';
-        $possibleReadIterations = $this->streamFileReader->getReadIterations();
+        $possibleIterations = $this->streamFileReader->getReadIterations();
         $randomChunkIndexes = $this->randomIntegerGenerator->generateBatch(
-            $possibleReadIterations,
+            $possibleIterations,
             $sampleSize
         );
 
         $charactersPerIteration = 1;
-        if ($sampleSize > $possibleReadIterations) {
-            $charactersPerIteration = (int) ceil($sampleSize / $possibleReadIterations);
+        if ($sampleSize > $possibleIterations) {
+            $charactersPerIteration = (int) ceil($sampleSize / $possibleIterations);
         }
 
         $currentChunkIndex = 0;
@@ -104,9 +104,9 @@ class StreamFileSampler implements SamplerInterface
         $chunk = $this->stripLineBreaks($chunk);
 
         $sample = '';
-        $neededReadIterations = (int) ceil($sampleSize / strlen($chunk));
+        $neededIterations = (int) ceil($sampleSize / strlen($chunk));
 
-        for ($iteration = 1; $iteration <= $neededReadIterations; $iteration++) {
+        for ($iteration = 1; $iteration <= $neededIterations; $iteration++) {
             $randomCharacterIndexes = $this->randomIntegerGenerator->generateBatch(strlen($chunk) - 1, $sampleSize);
 
             foreach ($randomCharacterIndexes as $index) {
