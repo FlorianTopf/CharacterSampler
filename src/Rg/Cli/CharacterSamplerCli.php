@@ -2,7 +2,6 @@
 namespace Rg\Cli;
 
 use Rg\Client\CurlClient;
-use Rg\Generator\RandomIntegerBatchGenerator;
 use Rg\Generator\RandomIntegerGenerator;
 use Rg\Generator\RandomStringGenerator;
 use Rg\Reader\StreamFileReader;
@@ -29,11 +28,6 @@ class CharacterSamplerCli
     protected $randomIntegerGenerator;
 
     /**
-     * @var RandomIntegerBatchGenerator
-     */
-    protected $randomIntegerBatchGenerator;
-
-    /**
      * @var RandomStringGenerator
      */
     protected $randomStringGenerator;
@@ -42,21 +36,17 @@ class CharacterSamplerCli
      * @param StreamFileReader $streamFileReader
      * @param CurlClient $curlClient
      * @param RandomIntegerGenerator $randomIntegerGenerator
-     * @param RandomIntegerBatchGenerator $randomIntegerBatchGenerator
      * @param RandomStringGenerator $randomStringGenerator
      */
     public function __construct(
         StreamFileReader $streamFileReader,
         CurlClient $curlClient,
         RandomIntegerGenerator $randomIntegerGenerator,
-        RandomIntegerBatchGenerator $randomIntegerBatchGenerator,
         RandomStringGenerator $randomStringGenerator
-    )
-    {
+    ) {
         $this->streamFileReader = $streamFileReader;
         $this->curlClient = $curlClient;
         $this->randomIntegerGenerator = $randomIntegerGenerator;
-        $this->randomIntegerBatchGenerator = $randomIntegerBatchGenerator;
         $this->randomStringGenerator = $randomStringGenerator;
     }
 
@@ -125,8 +115,7 @@ class CharacterSamplerCli
                 echo 'using file sampler' . PHP_EOL;
                 return new StreamFileSampler(
                     $this->streamFileReader,
-                    $this->randomIntegerGenerator,
-                    $this->randomIntegerBatchGenerator
+                    $this->randomIntegerGenerator
                 );
             case 'local':
             default:

@@ -47,7 +47,7 @@ class StreamFileReader
      */
     public function getReadIterations()
     {
-        return (int) round($this->getFileSize() / static::CHUNK_SIZE);
+        return (int) floor($this->getFileSize() / static::CHUNK_SIZE);
     }
 
     /**
@@ -55,6 +55,6 @@ class StreamFileReader
      */
     protected function readStreamChunk()
     {
-        return trim(fgets($this->fileResource, static::CHUNK_SIZE));
+        return fread($this->fileResource, static::CHUNK_SIZE);
     }
 }

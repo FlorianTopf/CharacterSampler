@@ -15,7 +15,6 @@ $characterSamplerCli = new CharacterSamplerCli(
     new StreamFileReader(STDIN),
     new CurlClient(),
     $randomIntegerGenerator,
-    new RandomIntegerBatchGenerator($randomIntegerGenerator),
     new RandomStringGenerator($randomIntegerGenerator)
 );
 

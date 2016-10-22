@@ -5,6 +5,8 @@ use Rg\Client\CurlClient;
 
 class HttpSourceSampler implements SamplerInterface
 {
+    use HasStringFormatter;
+
     /**
      * @var CurlClient
      */
@@ -21,14 +23,17 @@ class HttpSourceSampler implements SamplerInterface
     /**
      * @inheritdoc
      *
-     * sample size must be between [1, 20] at random.org
+     * A single sample size must be between [1, 20] at random.org so
+     * the function combines multiple samples if needed.
      */
     public function create($sampleSize)
     {
-        return $this->curlClient->send(
+        $chunkAmount = (int) ceil($sampleSize / 20);
+
+        $response = $this->curlClient->send(
             'https://www.random.org/strings/',
             [
-                'num' => 1,
+                'num' => $chunkAmount,
                 'len' => $sampleSize <= 20 ? $sampleSize : 20,
                 'digits' => 'on',
                 'upperalpha' => 'on',
@@ -38,5 +43,9 @@ class HttpSourceSampler implements SamplerInterface
                 'rnd' => 'new'
             ]
         );
+
+        $rawString = $this->stripLineBreaks($response);
+
+        return substr($rawString, 0, $sampleSize);
     }
 }

@@ -1,12 +1,13 @@
 <?php
 namespace Rg\Sampler;
 
-use Rg\Generator\RandomIntegerBatchGenerator;
 use Rg\Generator\RandomIntegerGenerator;
 use Rg\Reader\StreamFileReader;
 
 class StreamFileSampler implements SamplerInterface
 {
+    use HasStringFormatter;
+
     /**
      * @var StreamFileReader
      */
@@ -18,23 +19,15 @@ class StreamFileSampler implements SamplerInterface
     protected $randomIntegerGenerator;
 
     /**
-     * @var RandomIntegerBatchGenerator
-     */
-    protected $randomIntegerBatchGenerator;
-
-    /**
      * @param StreamFileReader $streamFileReader
      * @param RandomIntegerGenerator $randomIntegerGenerator
-     * @param RandomIntegerBatchGenerator $randomIntegerBatchGenerator
      */
     public function __construct(
         StreamFileReader $streamFileReader,
-        RandomIntegerGenerator $randomIntegerGenerator,
-        RandomIntegerBatchGenerator $randomIntegerBatchGenerator
+        RandomIntegerGenerator $randomIntegerGenerator
     ) {
         $this->streamFileReader = $streamFileReader;
         $this->randomIntegerGenerator = $randomIntegerGenerator;
-        $this->randomIntegerBatchGenerator = $randomIntegerBatchGenerator;
     }
 
     /**
@@ -42,7 +35,11 @@ class StreamFileSampler implements SamplerInterface
      */
     public function create($sampleSize)
     {
-        if (0 === $this->streamFileReader->getReadIterations()) {
+        $possibleReadIterations = $this->streamFileReader->getReadIterations();
+
+        // if the amount of possible stream chunks is lower than sample size
+        // the sample will be taken from one chunk
+        if (0 === $possibleReadIterations || $sampleSize > $possibleReadIterations) {
             return $this->extractFromOneChunk($sampleSize);
         } else {
             return $this->extractFromMultipleChunks($sampleSize);
@@ -57,12 +54,19 @@ class StreamFileSampler implements SamplerInterface
     protected function extractFromOneChunk($sampleSize)
     {
         $sample = '';
-        $chunk = $this->streamFileReader->read();
-        $randomIndexes = $this->randomIntegerBatchGenerator->generate(strlen($chunk) - 1, $sampleSize);
+        $chunk = $this->stripLineBreaks($this->streamFileReader->read());
 
-        foreach ($randomIndexes as $randomIndex) {
-            $sample .= $chunk[$randomIndex];
+        // if the sample size exceeds the available data the function does several iterations over the same stream
+        $neededReadIterations = (int) floor($sampleSize / strlen($chunk));
+
+        for ($iteration = 0; $iteration <= $neededReadIterations; $iteration++) {
+            $randomCharacterIndexes = $this->randomIntegerGenerator->generateBatch(strlen($chunk) - 1, $sampleSize);
+
+            foreach ($randomCharacterIndexes as $index) {
+                $sample .= $chunk[$index];
+            }
         }
+
         return $sample;
     }
 
@@ -74,15 +78,17 @@ class StreamFileSampler implements SamplerInterface
     protected function extractFromMultipleChunks($sampleSize)
     {
         $sample = '';
-        $randomIndexes = $this->randomIntegerBatchGenerator->generate(
+        $randomChunkIndexes = $this->randomIntegerGenerator->generateBatch(
             $this->streamFileReader->getReadIterations(),
             $sampleSize
         );
         $currentChunkIndex = 0;
 
         while (false !== ($chunk = $this->streamFileReader->read())) {
-            if (in_array($currentChunkIndex, $randomIndexes)) {
-                $sample .= $chunk[$this->randomIntegerGenerator->generate(strlen($chunk) - 1)];
+            if (in_array($currentChunkIndex, $randomChunkIndexes)) {
+                $chunk = $this->stripLineBreaks($chunk);
+                $randomCharacterIndex = $this->randomIntegerGenerator->generate(strlen($chunk) - 1);
+                $sample .= $chunk[$randomCharacterIndex];
             }
             $currentChunkIndex++;
         }
