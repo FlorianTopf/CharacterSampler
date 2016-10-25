@@ -2,20 +2,13 @@
 require_once(__DIR__ . '/vendor/autoload.php');
 
 use Rg\Reader\StreamFileReader;
-use Rg\Client\CurlClient;
 use Rg\Generator\RandomIntegerGenerator;
-use Rg\Generator\RandomStringGenerator;
 use Rg\Cli\CharacterSamplerCli;
 
 $before = memory_get_usage();
 
 $randomIntegerGenerator = new RandomIntegerGenerator();
-$characterSamplerCli = new CharacterSamplerCli(
-    new StreamFileReader(STDIN),
-    new CurlClient(),
-    $randomIntegerGenerator,
-    new RandomStringGenerator($randomIntegerGenerator)
-);
+$characterSamplerCli = new CharacterSamplerCli(new StreamFileReader(STDIN));
 
 $cliArguments = getopt('', ['size:', 'type:']);
 

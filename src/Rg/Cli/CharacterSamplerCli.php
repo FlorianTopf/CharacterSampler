@@ -1,14 +1,8 @@
 <?php
 namespace Rg\Cli;
 
-use Rg\Client\CurlClient;
-use Rg\Generator\RandomIntegerGenerator;
-use Rg\Generator\RandomStringGenerator;
 use Rg\Reader\StreamFileReader;
-use Rg\Sampler\HttpSourceSampler;
-use Rg\Sampler\LocalSourceSampler;
-use Rg\Sampler\SamplerInterface;
-use Rg\Sampler\StreamFileSampler;
+use Rg\Sampler\CharacterSamplerFactory;
 
 class CharacterSamplerCli
 {
@@ -20,36 +14,10 @@ class CharacterSamplerCli
     protected $streamFileReader;
 
     /**
-     * @var CurlClient
-     */
-    protected $curlClient;
-
-    /**
-     * @var RandomIntegerGenerator
-     */
-    protected $randomIntegerGenerator;
-
-    /**
-     * @var RandomStringGenerator
-     */
-    protected $randomStringGenerator;
-
-    /**
      * @param StreamFileReader $streamFileReader
-     * @param CurlClient $curlClient
-     * @param RandomIntegerGenerator $randomIntegerGenerator
-     * @param RandomStringGenerator $randomStringGenerator
      */
-    public function __construct(
-        StreamFileReader $streamFileReader,
-        CurlClient $curlClient,
-        RandomIntegerGenerator $randomIntegerGenerator,
-        RandomStringGenerator $randomStringGenerator
-    ) {
+    public function __construct(StreamFileReader $streamFileReader) {
         $this->streamFileReader = $streamFileReader;
-        $this->curlClient = $curlClient;
-        $this->randomIntegerGenerator = $randomIntegerGenerator;
-        $this->randomStringGenerator = $randomStringGenerator;
     }
 
     /**
@@ -61,7 +29,7 @@ class CharacterSamplerCli
     {
         $sampleType = $this->getSampleType($cliArguments);
         $sampleSize = $this->getSampleSize($cliArguments);
-        return $this->chooseSampler($sampleType)->create($sampleSize);
+        return CharacterSamplerFactory::choose($sampleType, $this->streamFileReader)->create($sampleSize);
     }
 
     /**
@@ -89,28 +57,5 @@ class CharacterSamplerCli
     protected function getSampleSize(array $cliArguments)
     {
         return (int) $cliArguments['size'] ?: static::DEFAULT_SAMPLE_SIZE;
-    }
-
-    /**
-     * @param string $sampleType
-     *
-     * @return SamplerInterface
-     */
-    protected function chooseSampler($sampleType) {
-        switch ($sampleType) {
-            case 'remote':
-                echo 'Using Remote Sampler' . PHP_EOL;
-                return new HttpSourceSampler($this->curlClient);
-            case 'file':
-                echo 'Using File Sampler' . PHP_EOL;
-                return new StreamFileSampler(
-                    $this->streamFileReader,
-                    $this->randomIntegerGenerator
-                );
-            case 'local':
-            default:
-                echo 'Using Local Sampler' . PHP_EOL;
-                return new LocalSourceSampler($this->randomStringGenerator);
-        }
     }
 }

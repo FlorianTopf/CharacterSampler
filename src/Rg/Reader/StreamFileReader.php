@@ -55,6 +55,7 @@ class StreamFileReader
      */
     protected function readStreamChunk()
     {
+        // problem here is that multi-byte chars might be chopped
         return fread($this->fileResource, static::CHUNK_SIZE);
     }
 }

@@ -1,9 +1,6 @@
 <?php
 namespace Rg\Cli;
 
-use Rg\Client\CurlClient;
-use Rg\Generator\RandomIntegerGenerator;
-use Rg\Generator\RandomStringGenerator;
 use Rg\Reader\StreamFileReader;
 
 class CharacterSamplerCliTest extends \PHPUnit_Framework_TestCase
@@ -13,12 +10,8 @@ class CharacterSamplerCliTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanGetFileSample()
     {
-        $randomIntegerGenerator = new RandomIntegerGenerator();
         $characterSamplerCli = new CharacterSamplerCli(
-            new StreamFileReader(fopen(__DIR__ . '/mock/sample.txt', 'r')),
-            new CurlClient(),
-            $randomIntegerGenerator,
-            new RandomStringGenerator($randomIntegerGenerator)
+            new StreamFileReader(fopen(__DIR__ . '/mock/sample.txt', 'r'))
         );
 
         $sample = $characterSamplerCli->getSample([
@@ -33,12 +26,8 @@ class CharacterSamplerCliTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanGetLocalSample()
     {
-        $randomIntegerGenerator = new RandomIntegerGenerator();
         $characterSamplerCli = new CharacterSamplerCli(
-            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r')),
-            new CurlClient(),
-            $randomIntegerGenerator,
-            new RandomStringGenerator($randomIntegerGenerator)
+            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r'))
         );
 
         $sample = $characterSamplerCli->getSample([
@@ -54,12 +43,8 @@ class CharacterSamplerCliTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanGetRemoteSample()
     {
-        $randomIntegerGenerator = new RandomIntegerGenerator();
         $characterSamplerCli = new CharacterSamplerCli(
-            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r')),
-            new CurlClient(),
-            $randomIntegerGenerator,
-            new RandomStringGenerator($randomIntegerGenerator)
+            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r'))
         );
 
         $sample = $characterSamplerCli->getSample([
@@ -75,12 +60,8 @@ class CharacterSamplerCliTest extends \PHPUnit_Framework_TestCase
      */
     public function testCanGetBaseSampleWithWrongArguments()
     {
-        $randomIntegerGenerator = new RandomIntegerGenerator();
         $characterSamplerCli = new CharacterSamplerCli(
-            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r')),
-            new CurlClient(),
-            $randomIntegerGenerator,
-            new RandomStringGenerator($randomIntegerGenerator)
+            new StreamFileReader(fopen(__DIR__ . '/mock/emptySample.txt', 'r'))
         );
 
         $sample = $characterSamplerCli->getSample([

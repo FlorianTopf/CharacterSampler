@@ -46,6 +46,7 @@ class RandomIntegerGenerator
                 $array[$keys[$i]] = $temp;
             }
         }
+        // resets indexes
         $array = array_values($array);
     }
 }
