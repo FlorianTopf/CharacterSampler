@@ -17,6 +17,10 @@ class RandomStringGenerator
     }
 
     /**
+     * Generates random string sequence
+     *
+     * @link http://stackoverflow.com/questions/4356289/php-random-string-generator
+     *
      * @param int $length
      *
      * @return string
